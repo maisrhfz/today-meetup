@@ -116,7 +116,9 @@ export default function App() {
 
   // events auto-disappear once they've been over for a while (see countdownInfo's
   // "ended" cutoff in utils.js) instead of lingering in the list marked as ended.
-  const activeEvents = events.filter((ev) => countdownInfo(new Date(ev.start), now).status !== 'ended')
+  const activeEvents = events.filter(
+    (ev) => countdownInfo(new Date(ev.start), new Date(ev.end), now).status !== 'ended'
+  )
 
   const visibleEvents = filter === 'mine'
     ? activeEvents.filter((ev) => matchesMyMajor(ev.course, profile.major))
