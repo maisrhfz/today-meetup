@@ -1,48 +1,72 @@
 import { useState } from 'react'
 
-export default function Onboarding({ initial, canCancel, onCancel, onSave }) {
-  const [name, setName] = useState(initial?.name || '')
-  const [major, setMajor] = useState(initial?.major || '')
+export default function Onboarding({ onSave, onCancel }) {
+  const [name, setName] = useState('')
+  const [major, setMajor] = useState('')
+  const [studentId, setStudentId] = useState('') // 1. Added state for student ID (학번)
 
-  function submit(e) {
+  function handleSubmit(e) {
     e.preventDefault()
-    if (!name.trim() || !major.trim()) return
-    onSave({ name: name.trim(), major: major.trim() })
+    if (!name.trim()) return
+
+    onSave({
+      name: name.trim(),
+      major: major.trim(),
+      studentId: studentId.trim(), // 2. Pass studentId in save handler
+    })
   }
 
   return (
     <div className="modal-overlay open">
       <div className="modal">
         <h2>시작하기 전에</h2>
-        <p className="modal-desc">이름과 전공을 알려주세요. 이벤트를 등록하거나 참여할 때 표시돼요.</p>
-        <form onSubmit={submit}>
+        <p className="description">
+          이름, 전공, 학번을 알려주세요. 이벤트를 등록하거나 참여할 때 표시돼요.
+        </p>
+
+        <form onSubmit={handleSubmit}>
           <div className="field">
-            <label htmlFor="pName">이름</label>
+            <label htmlFor="oName">이름</label>
             <input
-              id="pName"
+              id="oName"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="예: 김하늘"
-              maxLength={20}
+              placeholder="예: 홍길동"
               required
             />
           </div>
+
+          {/* 3. Added 학번 input field */}
           <div className="field">
-            <label htmlFor="pMajor">전공 / 학과</label>
+            <label htmlFor="oStudentId">학번</label>
             <input
-              id="pMajor"
+              id="oStudentId"
+              value={studentId}
+              onChange={(e) => setStudentId(e.target.value)}
+              placeholder="예: 2024123456"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="oMajor">전공 / 학과</label>
+            <input
+              id="oMajor"
               value={major}
               onChange={(e) => setMajor(e.target.value)}
               placeholder="예: 컴퓨터공학과"
-              maxLength={30}
-              required
             />
           </div>
+
           <div className="modal-actions">
-            {canCancel && (
-              <button type="button" className="btn-ghost" onClick={onCancel}>취소</button>
+            {onCancel && (
+              <button type="button" className="btn-ghost" onClick={onCancel}>
+                취소
+              </button>
             )}
-            <button type="submit" className="btn-solid">저장하고 시작하기</button>
+            <button type="submit" className="btn-solid">
+              저장하고 시작하기
+            </button>
           </div>
         </form>
       </div>
