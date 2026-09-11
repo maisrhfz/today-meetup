@@ -24,6 +24,7 @@ def seed_events():
             "title": "즉흥 잔디밭 프리스비",
             "location": "학생회관 앞 잔디밭",
             "start": now_iso(25),
+            "end": now_iso(25 + 90),
             "capacity": 12,
             "course": "",
             "organizer": "박서준",
@@ -34,6 +35,7 @@ def seed_events():
             "title": "남은 케이터링 나눔",
             "location": "공학관 3층 세미나실",
             "start": now_iso(70),
+            "end": now_iso(70 + 120),
             "capacity": 20,
             "course": "",
             "organizer": "이수아",
@@ -44,6 +46,7 @@ def seed_events():
             "title": "알고리즘 스터디 번개",
             "location": "중앙도서관 스터디홀",
             "start": now_iso(180),
+            "end": now_iso(180 + 120),
             "capacity": 15,
             "course": "컴퓨터공학과",
             "organizer": "김하늘",
@@ -54,6 +57,7 @@ def seed_events():
             "title": "경영학과 조별과제 급구",
             "location": "경영관 402호",
             "start": now_iso(60 * 26),
+            "end": now_iso(60 * 26 + 90),
             "capacity": 6,
             "course": "경영학과",
             "organizer": "정다은",
@@ -84,7 +88,7 @@ def list_events():
 @app.post("/api/events")
 def create_event():
     data = request.get_json(force=True) or {}
-    required = ["title", "location", "start", "capacity"]
+    required = ["title", "location", "start", "end", "capacity"]
     missing = [f for f in required if not data.get(f)]
     if missing:
         return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
@@ -99,6 +103,7 @@ def create_event():
         "title": data["title"],
         "location": data["location"],
         "start": data["start"],
+        "end": data["end"],
         "capacity": capacity,
         "course": data.get("course", ""),
         "organizer": data.get("organizer", "익명"),
@@ -116,7 +121,7 @@ def update_event(event_id):
         return jsonify({"error": "event not found"}), 404
 
     data = request.get_json(force=True) or {}
-    editable_text_fields = ["title", "location", "start", "course", "organizer"]
+    editable_text_fields = ["title", "location", "start", "end", "course", "organizer"]
 
     if "capacity" in data:
         try:
@@ -140,7 +145,7 @@ def update_event(event_id):
     for field in editable_text_fields:
         if field in data:
             value = data[field]
-            if field in ("title", "location", "start") and not value:
+            if field in ("title", "location", "start", "end") and not value:
                 return jsonify({"error": f"{field} cannot be empty"}), 400
             event[field] = value
 

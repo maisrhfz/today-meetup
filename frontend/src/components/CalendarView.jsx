@@ -87,7 +87,7 @@ export default function CalendarView({
                 {dayEvents.length > 0 && (
                   <div className="cal-dots">
                     {shown.map((ev) => {
-                      const info = countdownInfo(new Date(ev.start), now)
+                      const info = countdownInfo(new Date(ev.start), new Date(ev.end), now)
                       const urgent = info.status === 'ongoing' || info.cls === 'amber'
                       return <span key={ev.id} className={`cal-dot ${urgent ? 'urgent' : ''}`} />
                     })}

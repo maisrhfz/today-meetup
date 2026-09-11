@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { pad } from '../utils'
 
+function addHours(date, hours) {
+  return new Date(date.getTime() + hours * 3600000)
+}
+
 export default function AddEventModal({ open, defaultDate, event, onClose, onCreate, onUpdate }) {
   const [title, setTitle] = useState('')
   const [location, setLocation] = useState('')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [capacity, setCapacity] = useState('')
   const [course, setCourse] = useState('')
 
@@ -16,10 +22,14 @@ export default function AddEventModal({ open, defaultDate, event, onClose, onCre
 
     if (event) {
       const start = new Date(event.start)
+      // fall back to start+1h for any pre-existing event saved before "end" existed
+      const end = event.end ? new Date(event.end) : addHours(start, 1)
       setTitle(event.title)
       setLocation(event.location)
       setDate(`${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`)
       setTime(`${pad(start.getHours())}:${pad(start.getMinutes())}`)
+      setEndDate(`${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}`)
+      setEndTime(`${pad(end.getHours())}:${pad(end.getMinutes())}`)
       setCapacity(String(event.capacity))
       setCourse(event.course || '')
     } else {
@@ -29,6 +39,9 @@ export default function AddEventModal({ open, defaultDate, event, onClose, onCre
       setDate(`${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`)
       const t = new Date()
       setTime(`${pad(t.getHours())}:${pad(t.getMinutes())}`)
+      const defaultEnd = addHours(t, 1)
+      setEndDate(`${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`)
+      setEndTime(`${pad(defaultEnd.getHours())}:${pad(defaultEnd.getMinutes())}`)
       setCapacity('')
       setCourse('')
     }
@@ -38,12 +51,20 @@ export default function AddEventModal({ open, defaultDate, event, onClose, onCre
 
   function submit(e) {
     e.preventDefault()
-    if (!title || !location || !date || !time || !capacity) return
+    if (!title || !location || !date || !time || !endDate || !endTime || !capacity) return
+
+    const start = new Date(`${date}T${time}:00`)
+    const end = new Date(`${endDate}T${endTime}:00`)
+    if (end <= start) {
+      window.alert('종료 시간은 시작 시간보다 늦어야 해요.')
+      return
+    }
 
     const payload = {
       title,
       location,
-      start: new Date(`${date}T${time}:00`).toISOString(),
+      start: start.toISOString(),
+      end: end.toISOString(),
       capacity: parseInt(capacity, 10),
       course: course.trim(),
     }
@@ -78,12 +99,22 @@ export default function AddEventModal({ open, defaultDate, event, onClose, onCre
           </div>
           <div className="field-row">
             <div className="field">
-              <label htmlFor="fDate">날짜</label>
+              <label htmlFor="fDate">시작 날짜</label>
               <input id="fDate" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
             </div>
             <div className="field">
-              <label htmlFor="fTime">시간</label>
+              <label htmlFor="fTime">시작 시간</label>
               <input id="fTime" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+            </div>
+          </div>
+          <div className="field-row">
+            <div className="field">
+              <label htmlFor="fEndDate">종료 날짜</label>
+              <input id="fEndDate" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+            </div>
+            <div className="field">
+              <label htmlFor="fEndTime">종료 시간</label>
+              <input id="fEndTime" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
             </div>
           </div>
           <div className="field-row">

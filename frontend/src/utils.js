@@ -32,26 +32,29 @@ export function dateHeaderLabel(d, now) {
   return `${prefix}${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAYS[d.getDay()]})`
 }
 
-export function countdownInfo(start, now) {
-  const diff = start - now
-  const twoHours = 2 * 3600000
-  if (diff <= 0 && diff > -twoHours) {
+// start/end are the event's real start and end Date objects.
+// upcoming -> ongoing (LIVE) once `now` reaches start, ended once `now` reaches end.
+export function countdownInfo(start, end, now) {
+  if (now < start) {
+    const diff = start - now
+    const mins = Math.round(diff / 60000)
+    if (mins < 60) {
+      return { status: 'upcoming', value: `${mins}분`, label: '후 시작', cls: 'amber' }
+    }
+    if (diff < 24 * 3600000) {
+      const h = Math.floor(diff / 3600000)
+      const m = Math.round((diff % 3600000) / 60000)
+      return { status: 'upcoming', value: `${h}시간 ${m}분`, label: '후 시작', cls: h < 3 ? 'amber' : 'teal' }
+    }
+    const days = Math.ceil(diff / (24 * 3600000))
+    return { status: 'upcoming', value: `D-${days}`, label: '예정', cls: 'dim' }
+  }
+
+  if (now < end) {
     return { status: 'ongoing', value: 'LIVE', label: '진행 중', cls: 'teal' }
   }
-  if (diff <= -twoHours) {
-    return { status: 'ended', value: '종료', label: '모임 끝', cls: 'dim' }
-  }
-  const mins = Math.round(diff / 60000)
-  if (mins < 60) {
-    return { status: 'upcoming', value: `${mins}분`, label: '후 시작', cls: 'amber' }
-  }
-  if (diff < 24 * 3600000) {
-    const h = Math.floor(diff / 3600000)
-    const m = Math.round((diff % 3600000) / 60000)
-    return { status: 'upcoming', value: `${h}시간 ${m}분`, label: '후 시작', cls: h < 3 ? 'amber' : 'teal' }
-  }
-  const days = Math.ceil(diff / (24 * 3600000))
-  return { status: 'upcoming', value: `D-${days}`, label: '예정', cls: 'dim' }
+
+  return { status: 'ended', value: '종료', label: '모임 끝', cls: 'dim' }
 }
 
 export function matchesMyMajor(course, myMajor) {

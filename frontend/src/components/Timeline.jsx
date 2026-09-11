@@ -18,7 +18,8 @@ export default function Timeline({ events, now, profile, onJoin, onEdit, onDelet
 
   sorted.forEach((ev) => {
     const start = new Date(ev.start)
-    const info = countdownInfo(start, now)
+    const end = new Date(ev.end)
+    const info = countdownInfo(start, end, now)
     if (info.status === 'ongoing') {
       ongoing.push(ev)
     } else {

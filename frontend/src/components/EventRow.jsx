@@ -2,7 +2,8 @@ import { countdownInfo, fmtTime } from '../utils'
 
 export default function EventRow({ event, now, profile, onJoin, onEdit, onDelete }) {
   const start = new Date(event.start)
-  const info = countdownInfo(start, now)
+  const end = new Date(event.end)
+  const info = countdownInfo(start, end, now)
   const joinedCount = event.joinedNames.length
   const full = joinedCount >= event.capacity
   const joinedByMe = profile && event.joinedNames.includes(profile.name)
@@ -65,7 +66,7 @@ export default function EventRow({ event, now, profile, onJoin, onEdit, onDelete
             </div>
           )}
         </div>
-        <div className="row-meta">{event.location} · {fmtTime(start)}</div>
+        <div className="row-meta">{event.location} · {fmtTime(start)} - {fmtTime(end)}</div>
         <div className="row-tags">
           <span className="tag course">{event.course || '전체 전공'}</span>
           <span className="tag">등록: {event.organizer || '익명'}</span>
