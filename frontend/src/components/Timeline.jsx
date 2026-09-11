@@ -1,7 +1,7 @@
 import EventRow from './EventRow'
 import { countdownInfo, dateHeaderLabel } from '../utils'
 
-export default function Timeline({ events, now, profile, onJoin, emptyLabel }) {
+export default function Timeline({ events, now, profile, onJoin, onEdit, onDelete, emptyLabel }) {
   const sorted = [...events].sort((a, b) => new Date(a.start) - new Date(b.start))
 
   if (sorted.length === 0) {
@@ -34,7 +34,7 @@ export default function Timeline({ events, now, profile, onJoin, emptyLabel }) {
         <>
           <div className="group-header">지금 진행 중 <span className="count">· {ongoing.length}건</span></div>
           {ongoing.map((ev) => (
-            <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} />
+            <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </>
       )}
@@ -44,7 +44,7 @@ export default function Timeline({ events, now, profile, onJoin, emptyLabel }) {
             {dateHeaderLabel(new Date(list[0].start), now)} <span className="count">· {list.length}건</span>
           </div>
           {list.map((ev) => (
-            <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} />
+            <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </div>
       ))}

@@ -4,7 +4,7 @@ import Onboarding from './components/Onboarding'
 import AddEventModal from './components/AddEventModal'
 import CalendarView from './components/CalendarView'
 import Timeline from './components/Timeline'
-import { fetchEvents, createEvent, joinEvent } from './api'
+import { fetchEvents, createEvent, updateEvent, deleteEvent, joinEvent } from './api'
 import { dateKey, matchesMyMajor } from './utils'
 
 const PROFILE_KEY = 'todaymeetup_profile'
@@ -18,6 +18,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState('calendar') // 'calendar' | 'list'
   const [filter, setFilter] = useState('all') // 'all' | 'mine'
   const [addOpen, setAddOpen] = useState(false)
+  const [editingEvent, setEditingEvent] = useState(null)
 
   const today = new Date()
   const [calYear, setCalYear] = useState(today.getFullYear())
@@ -79,6 +80,25 @@ export default function App() {
     }
   }
 
+  async function handleUpdate(id, payload) {
+    try {
+      const updated = await updateEvent(id, payload)
+      setEvents((evts) => evts.map((e) => (e.id === id ? updated : e)))
+      setEditingEvent(null)
+    } catch (e) {
+      console.error('failed to update event', e)
+    }
+  }
+
+  async function handleDelete(id) {
+    try {
+      await deleteEvent(id)
+      setEvents((evts) => evts.filter((e) => e.id !== id))
+    } catch (e) {
+      console.error('failed to delete event', e)
+    }
+  }
+
   if (!profileLoaded) return null
 
   if (!profile || editingProfile) {
@@ -126,6 +146,8 @@ export default function App() {
             now={now}
             profile={profile}
             onJoin={handleJoin}
+            onEdit={setEditingEvent}
+            onDelete={handleDelete}
             calYear={calYear}
             calMonth={calMonth}
             selectedKey={selectedKey}
@@ -139,16 +161,20 @@ export default function App() {
             now={now}
             profile={profile}
             onJoin={handleJoin}
+            onEdit={setEditingEvent}
+            onDelete={handleDelete}
             emptyLabel={filter === 'mine' ? '내 전공에 맞는 이벤트가 아직 없어요' : '아직 등록된 이벤트가 없어요'}
           />
         )}
       </div>
 
       <AddEventModal
-        open={addOpen}
+        open={addOpen || !!editingEvent}
         defaultDate={defaultDateForModal}
-        onClose={() => setAddOpen(false)}
+        event={editingEvent}
+        onClose={() => { setAddOpen(false); setEditingEvent(null) }}
         onCreate={handleCreate}
+        onUpdate={handleUpdate}
       />
     </div>
   )
