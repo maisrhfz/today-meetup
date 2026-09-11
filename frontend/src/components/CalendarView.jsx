@@ -51,7 +51,13 @@ export default function CalendarView({
           <div className="cal-month-label">{calYear}년 {calMonth + 1}월</div>
           <button onClick={() => shiftMonth(1)} title="다음 달">›</button>
           <button onClick={() => setCalYear((y) => y + 1)} title="다음 해">»</button>
-          <button className="cal-today-btn" onClick={goToday}>오늘</button>
+          <button 
+            className="cal-today-btn" 
+            onClick={goToday}
+            style={{ width: 'auto', minWidth: '48px', padding: '0 10px', whiteSpace: 'nowrap' }}
+          >
+            오늘
+          </button>
         </div>
         <div className="cal-grid">
           {WEEKDAYS.map((wd, i) => (

@@ -1,6 +1,7 @@
 import { useTheme } from "../useTheme";
 import { useEffect, useState } from 'react'
 import { pad } from '../utils'
+import kuLogo from '../ku-logo.png'
 
 export default function Header({ profile, onEditProfile, onAddEvent }) {
   const [clock, setClock] = useState('')
@@ -16,16 +17,31 @@ export default function Header({ profile, onEditProfile, onAddEvent }) {
     return () => clearInterval(id)
   }, [])
 
+  const renderProfileText = () => {
+    if (!profile) return '프로필 설정'
+    const parts = [profile.name]
+    if (profile.studentId) parts.push(profile.studentId)
+    if (profile.major) parts.push(profile.major)
+    return parts.join(' · ')
+  }
+
   return (
     <div className="board-header">
       <div className="brand-block">
-        <div className="brand">오늘모임</div>
-        <div className="brand-sub">캠퍼스 실시간 모임 게시판</div>
+        <img 
+          src={kuLogo} 
+          alt="Korea University Symbol" 
+          className="brand-logo" 
+        />
+        <div>
+          <div className="brand">오늘모임</div>
+          <div className="brand-sub">캠퍼스 실시간 모임 게시판</div>
+        </div>
       </div>
       <div className="header-right">
         <button className="profile-chip" onClick={onEditProfile}>
           <span className="dot" />
-          <span>{profile ? `${profile.name} · ${profile.major}` : '프로필 설정'}</span>
+          <span>{renderProfileText()}</span>
         </button>
         <div className="live-clock">{clock}</div>
         <button className="add-btn" onClick={onAddEvent}>+ 이벤트 등록</button>
