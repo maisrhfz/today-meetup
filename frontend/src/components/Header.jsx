@@ -1,9 +1,11 @@
+import { useTheme } from "../useTheme";
 import { useEffect, useState } from 'react'
 import { pad } from '../utils'
 import kuLogo from '../ku-logo.png'
 
 export default function Header({ profile, onEditProfile, onAddEvent }) {
   const [clock, setClock] = useState('')
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const tick = () => {
@@ -43,6 +45,9 @@ export default function Header({ profile, onEditProfile, onAddEvent }) {
         </button>
         <div className="live-clock">{clock}</div>
         <button className="add-btn" onClick={onAddEvent}>+ 이벤트 등록</button>
+        <button className="profile-chip" onClick={toggleTheme} aria-label="Toggle dark mode">
+          {theme === "dark" ? "☀️" : "🌙"}
+        </button>
       </div>
     </div>
   )
