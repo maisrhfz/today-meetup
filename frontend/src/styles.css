@@ -13,6 +13,19 @@
   --sans:'IBM Plex Sans KR', system-ui, sans-serif;
   --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 }
+[data-theme="light"]{
+  --board-bg:#f6f3ec;
+  --panel:#ffffff;
+  --panel-alt:#f0ece1;
+  --hairline:#ddd6c8;
+  --ink:#1a1a1a;
+  --ink-dim:#5c5c5c;
+  --ink-faint:#8a8a8a;
+  --amber:#b8860b;
+  --teal:#2f7d6c;
+  --red:#c23b28;
+  --blue:#3d6fa5;
+}
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
