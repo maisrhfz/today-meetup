@@ -5,7 +5,7 @@ import AddEventModal from './components/AddEventModal'
 import CalendarView from './components/CalendarView'
 import Timeline from './components/Timeline'
 import { fetchEvents, createEvent, updateEvent, deleteEvent, joinEvent } from './api'
-import { dateKey, matchesMyMajor } from './utils'
+import { countdownInfo, dateKey, matchesMyMajor } from './utils'
 
 const PROFILE_KEY = 'todaymeetup_profile'
 
@@ -113,9 +113,14 @@ export default function App() {
   }
 
   const now = new Date(nowTick)
+
+  // events auto-disappear once they've been over for a while (see countdownInfo's
+  // "ended" cutoff in utils.js) instead of lingering in the list marked as ended.
+  const activeEvents = events.filter((ev) => countdownInfo(new Date(ev.start), now).status !== 'ended')
+
   const visibleEvents = filter === 'mine'
-    ? events.filter((ev) => matchesMyMajor(ev.course, profile.major))
-    : events
+    ? activeEvents.filter((ev) => matchesMyMajor(ev.course, profile.major))
+    : activeEvents
 
   const [dy, dm, dd] = selectedKey.split('-').map(Number)
   const defaultDateForModal = viewMode === 'calendar' ? new Date(dy, dm, dd) : new Date()
