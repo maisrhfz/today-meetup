@@ -2,7 +2,7 @@ import EventRow from './EventRow'
 import { WEEKDAYS, dateKey, isSameDate, countdownInfo } from '../utils'
 
 export default function CalendarView({
-  events, now, profile, onJoin,
+  events, now, profile, onJoin, onEdit, onDelete,
   calYear, calMonth, selectedKey,
   setCalYear, setCalMonth, setSelectedKey,
 }) {
@@ -51,8 +51,8 @@ export default function CalendarView({
           <div className="cal-month-label">{calYear}년 {calMonth + 1}월</div>
           <button onClick={() => shiftMonth(1)} title="다음 달">›</button>
           <button onClick={() => setCalYear((y) => y + 1)} title="다음 해">»</button>
-          <button 
-            className="cal-today-btn" 
+          <button
+            className="cal-today-btn"
             onClick={goToday}
             style={{ width: 'auto', minWidth: '48px', padding: '0 10px', whiteSpace: 'nowrap' }}
           >
@@ -111,7 +111,7 @@ export default function CalendarView({
         </div>
       ) : (
         selEvents.map((ev) => (
-          <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} />
+          <EventRow key={ev.id} event={ev} now={now} profile={profile} onJoin={onJoin} onEdit={onEdit} onDelete={onDelete} />
         ))
       )}
     </>

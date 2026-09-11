@@ -16,6 +16,24 @@ export async function createEvent(payload) {
   return res.json()
 }
 
+export async function updateEvent(id, payload) {
+  const res = await fetch(`${API_URL}/api/events/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) throw new Error('failed to update event')
+  return res.json()
+}
+
+export async function deleteEvent(id) {
+  const res = await fetch(`${API_URL}/api/events/${id}`, {
+    method: 'DELETE',
+  })
+  if (!res.ok) throw new Error('failed to delete event')
+  return res.json()
+}
+
 export async function joinEvent(id, name) {
   const res = await fetch(`${API_URL}/api/events/${id}/join`, {
     method: 'POST',

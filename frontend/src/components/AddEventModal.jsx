@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { pad } from '../utils'
 
-export default function AddEventModal({ open, defaultDate, onClose, onCreate }) {
+export default function AddEventModal({ open, defaultDate, event, onClose, onCreate, onUpdate }) {
   const [title, setTitle] = useState('')
   const [location, setLocation] = useState('')
   const [date, setDate] = useState('')
@@ -9,26 +9,51 @@ export default function AddEventModal({ open, defaultDate, onClose, onCreate }) 
   const [capacity, setCapacity] = useState('')
   const [course, setCourse] = useState('')
 
+  const isEditing = !!event
+
   useEffect(() => {
     if (!open) return
-    const base = defaultDate || new Date()
-    setDate(`${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`)
-    const t = new Date()
-    setTime(`${pad(t.getHours())}:${pad(t.getMinutes())}`)
-  }, [open, defaultDate])
+
+    if (event) {
+      const start = new Date(event.start)
+      setTitle(event.title)
+      setLocation(event.location)
+      setDate(`${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`)
+      setTime(`${pad(start.getHours())}:${pad(start.getMinutes())}`)
+      setCapacity(String(event.capacity))
+      setCourse(event.course || '')
+    } else {
+      const base = defaultDate || new Date()
+      setTitle('')
+      setLocation('')
+      setDate(`${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`)
+      const t = new Date()
+      setTime(`${pad(t.getHours())}:${pad(t.getMinutes())}`)
+      setCapacity('')
+      setCourse('')
+    }
+  }, [open, defaultDate, event])
 
   if (!open) return null
 
   function submit(e) {
     e.preventDefault()
     if (!title || !location || !date || !time || !capacity) return
-    onCreate({
+
+    const payload = {
       title,
       location,
       start: new Date(`${date}T${time}:00`).toISOString(),
       capacity: parseInt(capacity, 10),
       course: course.trim(),
-    })
+    }
+
+    if (isEditing) {
+      onUpdate(event.id, payload)
+    } else {
+      onCreate(payload)
+    }
+
     setTitle('')
     setLocation('')
     setCapacity('')
@@ -41,7 +66,7 @@ export default function AddEventModal({ open, defaultDate, onClose, onCreate }) 
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="modal">
-        <h2>새 이벤트 등록</h2>
+        <h2>{isEditing ? '이벤트 수정' : '새 이벤트 등록'}</h2>
         <form onSubmit={submit}>
           <div className="field">
             <label htmlFor="fTitle">제목</label>
@@ -73,7 +98,7 @@ export default function AddEventModal({ open, defaultDate, onClose, onCreate }) 
           </div>
           <div className="modal-actions">
             <button type="button" className="btn-ghost" onClick={onClose}>취소</button>
-            <button type="submit" className="btn-solid">등록하기</button>
+            <button type="submit" className="btn-solid">{isEditing ? '저장하기' : '등록하기'}</button>
           </div>
         </form>
       </div>

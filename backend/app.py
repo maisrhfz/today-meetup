@@ -67,6 +67,10 @@ def seed_events():
 EVENTS = seed_events()
 
 
+def find_event(event_id):
+    return next((e for e in EVENTS if e["id"] == event_id), None)
+
+
 @app.get("/api/health")
 def health():
     return jsonify({"status": "ok"})
@@ -104,6 +108,55 @@ def create_event():
     return jsonify(event), 201
 
 
+@app.patch("/api/events/<event_id>")
+def update_event(event_id):
+    """Partial update — only send the fields you want to change."""
+    event = find_event(event_id)
+    if not event:
+        return jsonify({"error": "event not found"}), 404
+
+    data = request.get_json(force=True) or {}
+    editable_text_fields = ["title", "location", "start", "course", "organizer"]
+
+    if "capacity" in data:
+        try:
+            new_capacity = int(data["capacity"])
+        except (TypeError, ValueError):
+            return jsonify({"error": "capacity must be a number"}), 400
+        if new_capacity < len(event["joinedNames"]):
+            return (
+                jsonify(
+                    {
+                        "error": (
+                            f"capacity can't be less than the "
+                            f"{len(event['joinedNames'])} people already joined"
+                        )
+                    }
+                ),
+                400,
+            )
+        event["capacity"] = new_capacity
+
+    for field in editable_text_fields:
+        if field in data:
+            value = data[field]
+            if field in ("title", "location", "start") and not value:
+                return jsonify({"error": f"{field} cannot be empty"}), 400
+            event[field] = value
+
+    return jsonify(event)
+
+
+@app.delete("/api/events/<event_id>")
+def delete_event(event_id):
+    event = find_event(event_id)
+    if not event:
+        return jsonify({"error": "event not found"}), 404
+
+    EVENTS.remove(event)
+    return jsonify({"deleted": event_id}), 200
+
+
 @app.post("/api/events/<event_id>/join")
 def join_event(event_id):
     data = request.get_json(force=True) or {}
@@ -111,7 +164,7 @@ def join_event(event_id):
     if not name:
         return jsonify({"error": "name is required"}), 400
 
-    event = next((e for e in EVENTS if e["id"] == event_id), None)
+    event = find_event(event_id)
     if not event:
         return jsonify({"error": "event not found"}), 404
 
